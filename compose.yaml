@@ -1,0 +1,34 @@
+﻿name: WizWear
+
+services:
+  wizwear.api:
+    image: wizwear.api
+    container_name: wizwear.api
+    ports:
+      - "5156:8080"
+    build:
+      context: .
+      dockerfile: WizWear.Api/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      mongo:
+        condition: service_started
+    environment:
+      - ConnectionStrings__RabbitMq=amqp://guest:guest@wizzwair.rabbitmq:5672
+      - ConnectionStrings__MongoDB=mongodb://root:rootpw@wizzwair.mongo:27017/
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: wizzwair.rabbitmq
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI port
+      
+  mongo:
+    image: mongo 
+    container_name: wizzwair.mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpw
